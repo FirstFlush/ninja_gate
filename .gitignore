@@ -1,0 +1,89 @@
+# Mine
+log/
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+*.pyd
+*.pyo
+.Python
+env/
+venv/
+ENV/
+env.bak/
+*.env
+*.env.*
+
+# Virtualenvs
+.venv/
+.venv.bak/
+*.venv/
+
+# Django
+*.log
+*.pot
+*.pyc
+*.mo
+*.db
+*.sqlite3
+local_settings.py
+db.sqlite3
+media/
+staticfiles/
+static/
+public/static/
+public/media/
+
+# VSCode
+.vscode/
+
+# PyCharm
+.idea/
+
+# macOS
+.DS_Store
+
+# system
+Thumbs.db
+ehthumbs.db
+Icon?
+Desktop.ini
+
+# Coverage
+.coverage
+htmlcov/
+.tox/
+.cache/
+.pytest_cache/
+
+# Testing
+test_output/
+junitxml_reports/
+
+# Build artifacts
+build/
+dist/
+*.tgz
+*.tar.gz
+*.egg-info/
+.eggs/
+*.manifest
+
+# spaCy
+*.spacy
+*.model
+*.vectors
+*.jsonl
+*.docbin
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*.swo
