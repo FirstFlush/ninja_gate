@@ -9,7 +9,14 @@ logger = logging.getLogger(__name__)
 router = Router()
 
 
-@router.post("/bleh")
+@router.post("/preflight")
 def predict(request: HttpRequest):
 
     return Response({"bleh":"blah"})
+
+
+
+@router.post("/unresolved")
+def unresolved(request: HttpRequest):
+    
+    return Response({"foo":"bar"})
