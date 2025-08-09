@@ -21,6 +21,10 @@ from ninja import NinjaAPI
 from gatekeeper.api import router as gatekeeper_router
 from .api import router as home_router
 
+admin.site.site_header = "Ninja Gate Admin Panel"
+admin.site.site_title = "Ninja Gate"
+admin.site.index_title = "Ninja Gate"
+
 api = NinjaAPI()
 
 api.add_router("/", home_router)
