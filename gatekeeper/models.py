@@ -1,6 +1,6 @@
 from django.db import models
 from .enums import (
-    AbuseEventEnum, 
+    AbuseEventTypeEnum, 
     AbuseCategoryEnum, 
     AbuseEventSourceEnum,
     RiskProfileStatus,
@@ -12,16 +12,15 @@ class RiskProfile(models.Model):
     phone_number = models.CharField(max_length=20, unique=True)
     risk_level = models.CharField(max_length=24, choices=RiskLevelEnum.choices)
     status = models.CharField(max_length=24, choices=RiskProfileStatus.choices)
-    risk_score = models.IntegerField(default=0)
     last_seen = models.DateTimeField()
     created = models.DateTimeField(auto_now_add=True)
 
 
 class AbuseEventType(models.Model):
-    name = models.CharField(max_length=24, choices=AbuseEventEnum.choices, unique=True)
+    name = models.CharField(max_length=24, choices=AbuseEventTypeEnum.choices, unique=True)
     category = models.CharField(max_length=24, choices=AbuseCategoryEnum.choices)
     description = models.TextField(null=True, blank=True)   # Optional: human-readable description
-    severity_weight = models.IntegerField(default=0)        # How much this affects risk score
+    risk_level = models.CharField(max_length=24, choices=RiskLevelEnum.choices)
 
 
 class AbuseEvent(models.Model):

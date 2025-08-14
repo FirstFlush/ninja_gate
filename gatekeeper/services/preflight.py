@@ -1,8 +1,9 @@
+from ..schemas import PreflightRequestData
 
-
-class GateKeeperService:
-    ...
-
+class PreflightService:
+    
+    def __init__(self, data: PreflightRequestData):
+        self.data = data
 
 
 
