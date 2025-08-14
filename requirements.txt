@@ -11,3 +11,4 @@ sqlparse==0.5.3
 typed-api-response==1.0.0
 typing-inspection==0.4.1
 typing_extensions==4.14.1
+street-ninja-common @ git+https://github.com/firstflush/street-ninja-common.git@v1.0.0
