@@ -1,5 +1,6 @@
 import logging
 from django.db import IntegrityError, DatabaseError
+from django.utils import timezone
 from gatekeeper.enums import AbuseEventSourceEnum
 from ..schemas import PreflightRequestData
 from .abuse_detection import AbuseDetectionService
@@ -19,15 +20,7 @@ class PreflightService:
         self.abuse_event_service = AbuseEventService(self.risk_profile, AbuseEventSourceEnum.PREFLIGHT)
         
     def _get_or_create_profile(self) -> RiskProfile:
-        try:
-            profile, created = RiskProfile.objects.get_or_create(phone_number=self.data.phone_number)
-        except DatabaseError as e:
-            msg = f"Could not get or create RiskProfile due to unexpected database error `{e.__class__.__name__}`"
-            logger.error(msg, exc_info=True)
-            raise
-        else:
-            logger.debug(f"RiskProfile for phone number: `{profile.phone_number}`, created: `{created}`")
-            return profile
+        return RiskProfile.objects.get_or_create_by_phone(self.data.phone_number)[0]
 
     def detect_abuse_events(self) -> DetectedAbuseEvents:
         abuse_events = self.abuse_detection_service.run_checks()

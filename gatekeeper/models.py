@@ -1,4 +1,6 @@
-from django.db import models
+from django.db import models, IntegrityError, DatabaseError
+from django.utils import timezone
+import logging
 from .enums import (
     AbuseEventTypeEnum, 
     AbuseCategoryEnum, 
@@ -6,6 +8,36 @@ from .enums import (
     RiskProfileStatus,
     RiskLevelEnum
 )
+
+
+logger = logging.getLogger(__name__)
+
+
+class RiskProfileManager(models.Manager):
+      
+    def get_or_create_by_phone(self, phone_number: str) -> tuple["RiskProfile", bool]:
+        try:
+            profile, created = RiskProfile.objects.get_or_create(
+                phone_number=phone_number,
+                defaults={
+                    "last_seen": timezone.now(),
+                }
+            )
+            
+        except IntegrityError as e:
+            msg = f"Could not get or create RiskProfile due to integrity error!"
+            logger.error(msg, exc_info=True)
+            raise
+        
+        except DatabaseError as e:
+            msg = f"Could not get or create RiskProfile due to unexpected database error `{e.__class__.__name__}`"
+            logger.error(msg, exc_info=True)
+            raise
+        
+        else:
+            logger.debug(f"RiskProfile for phone number: `{profile.phone_number}`, created: `{created}`")
+            return profile, created
+
 
 class RiskProfile(models.Model):
     
@@ -15,6 +47,7 @@ class RiskProfile(models.Model):
     last_seen = models.DateTimeField()
     created = models.DateTimeField(auto_now_add=True)
 
+    objects: RiskProfileManager = RiskProfileManager()
 
 class AbuseEventType(models.Model):
     name = models.CharField(max_length=24, choices=AbuseEventTypeEnum.choices, unique=True)
