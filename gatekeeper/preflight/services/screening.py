@@ -10,7 +10,7 @@ from ..schemas import PreflightRequestData
 logger = logging.getLogger(__name__)
 
 
-class AbuseDetectionService:
+class ScreeningService:
     
     ABUSE_CHECK_TO_ABUSE_TYPE = {
         AbuseChecks.code_injection: AbuseEventTypeEnum.MALICIOUS,
@@ -23,7 +23,7 @@ class AbuseDetectionService:
 
     def __init__(self, data: PreflightRequestData):
         self.data = data
-        
+
     def run_checks(self) -> DetectedAbuseEvents:
         try:
             abuse_events = self._detect_abuse_events()

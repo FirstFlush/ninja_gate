@@ -5,18 +5,18 @@ from .models import RiskProfile, AbuseEventType, AbuseEvent
 
 @admin.register(RiskProfile)
 class RiskProfileAdmin(BaseAdmin):
-    list_display = ('phone_number', 'risk_level', 'status', 'last_seen', 'created')
-    list_filter = ('risk_level', 'status')
+    list_display = ('phone_number', 'status', 'last_seen', 'created')
+    list_filter = ('status',)
     search_fields = ('phone_number',)
     readonly_fields = ('created',)
     ordering = ('phone_number',)
     
     fieldsets = (
         (None, {
-            'fields': ('phone_number', 'risk_score')
+            'fields': ('phone_number',)
         }),
         ('Status', {
-            'fields': ('risk_level', 'status')
+            'fields': ('status',)
         }),
         ('Timestamps', {
             'fields': ('last_seen', 'created'),

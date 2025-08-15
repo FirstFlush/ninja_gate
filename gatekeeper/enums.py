@@ -1,20 +1,38 @@
 from common.base_enum import StreetNinjaEnum
 
 
-class RiskLevelEnum(StreetNinjaEnum):
-
-    LOW = "low"                     # 0-30: Clean/active
-    MODERATE = "moderate"           # 31-60: Flagged/monitored
-    HIGH = "high"                   # 61-90: Rate limited/soft blocked
-    BLOCKED = "blocked"             # 91-100: Hard blocked/banned
-
-
 class RiskProfileStatus(StreetNinjaEnum):
-   ACTIVE = "active"                # Normal service, no restrictions
-   FLAGGED = "flagged"              # Elevated monitoring, won't receive help message again for jibberish replies
-   RATE_LIMITED = "rate_limited"    # Throttled messaging (e.g., max 3 messages/hour)
-   SUSPENDED = "suspended"          # Temporary timeout (6-24 hours), auto-expires
-   BANNED = "banned"                # Permanent restriction, admin override only
+    """
+    Risk assessment levels for phone numbers interacting with the SMS service.
+    
+    This enum defines escalating restriction levels based on usage patterns and 
+    geographic/technical factors. Designed for cost optimization and fraud prevention
+    in a Canadian homeless services SMS system.
+    
+    Levels (in order of restriction):
+    
+    ACTIVE: Normal service with full functionality. Phone number has no identified
+            issues and receives standard service including help messages for 
+            unrecognized input.
+    
+    FLAGGED: Cost optimization mode. Phone number can still use the service normally
+                for legitimate requests, but will not receive help messages when sending
+                gibberish/unrecognized input to avoid SMS costs. Typically auto-expires
+                after 6-24 hours.
+    
+    SUSPENDED: Temporary complete service block. Applied to numbers that may be
+                legitimately recycled to new users (VoIP numbers, numbers sending
+                malicious content). Prevents all service interaction for 1-3 months
+                to allow number recycling. Auto-expires.
+    
+    BANNED: Permanent service restriction. Applied to numbers that will never be
+            valid for Canadian homeless services (international numbers, confirmed
+            non-Canadian regions). Requires admin override to remove.
+    """
+    ACTIVE = "active"               # Normal service
+    FLAGGED = "flagged"             # No help messages sent on gibberish, but can still use service
+    SUSPENDED = "suspended"         # Complete block (VoIP, suspicious chars - temp recyclable numbers)  
+    BANNED = "banned"               # Permanent block (international, confirmed invalid regions)
 
 
 class AbuseCategoryEnum(StreetNinjaEnum):
