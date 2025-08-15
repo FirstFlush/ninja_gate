@@ -1,10 +1,4 @@
 from pydantic import BaseModel
-
-
-class PreflightRequestData(BaseModel):
-    
-    phone_number: str
-    msg: str
     
     
 class UnresolvedAnalysisRequestData(BaseModel):

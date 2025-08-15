@@ -10,8 +10,8 @@ from .enums import (
 class RiskProfile(models.Model):
     
     phone_number = models.CharField(max_length=20, unique=True)
-    risk_level = models.CharField(max_length=24, choices=RiskLevelEnum.choices)
-    status = models.CharField(max_length=24, choices=RiskProfileStatus.choices)
+    risk_level = models.CharField(max_length=24, choices=RiskLevelEnum.choices, default=RiskLevelEnum.LOW.value)
+    status = models.CharField(max_length=24, choices=RiskProfileStatus.choices, default=RiskProfileStatus.ACTIVE.value)
     last_seen = models.DateTimeField()
     created = models.DateTimeField(auto_now_add=True)
 

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from ninja_gate.base_admin import BaseAdmin
+from street_ninja_common.admin import BaseAdmin
 from .models import RiskProfile, AbuseEventType, AbuseEvent
 
 
