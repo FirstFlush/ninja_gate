@@ -9,8 +9,8 @@ from .models import RiskProfile, AbuseEvent
 class StatusChangeData:
 
     profile: RiskProfile
-    trigger_event: AbuseEvent
     new_status: RiskProfileStatus
     effective_at: datetime
+    trigger_event: Optional[AbuseEvent] = None
     expires_at: Optional[datetime] = None
     notes: Optional[str] = None
