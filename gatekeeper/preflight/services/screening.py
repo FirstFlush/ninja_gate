@@ -1,7 +1,7 @@
 import logging
 from typing import Callable
 from gatekeeper.enums import AbuseEventTypeEnum
-from ..abuse_checks import AbuseChecks
+from ..screening_checks import ScreeningChecks
 from ..dataclasses import DetectedAbuseEvent, DetectedAbuseEvents
 from ..exc import AbuseDetectionError
 from ..schemas import PreflightRequestData
@@ -13,12 +13,12 @@ logger = logging.getLogger(__name__)
 class ScreeningService:
     
     ABUSE_CHECK_TO_ABUSE_TYPE = {
-        AbuseChecks.code_injection: AbuseEventTypeEnum.MALICIOUS,
-        AbuseChecks.commercial_spam: AbuseEventTypeEnum.COMMERCIAL_SPAM,
-        AbuseChecks.international_number: AbuseEventTypeEnum.INTERNATIONAL_NUMBER,
-        AbuseChecks.sqli: AbuseEventTypeEnum.MALICIOUS,
-        AbuseChecks.usa_number: AbuseEventTypeEnum.USA_NUMBER,
-        AbuseChecks.voip_number: AbuseEventTypeEnum.VOIP_NUMBER,
+        ScreeningChecks.code_injection: AbuseEventTypeEnum.MALICIOUS,
+        ScreeningChecks.commercial_spam: AbuseEventTypeEnum.COMMERCIAL_SPAM,
+        ScreeningChecks.international_number: AbuseEventTypeEnum.INTERNATIONAL_NUMBER,
+        ScreeningChecks.sqli: AbuseEventTypeEnum.MALICIOUS,
+        ScreeningChecks.usa_number: AbuseEventTypeEnum.USA_NUMBER,
+        ScreeningChecks.voip_number: AbuseEventTypeEnum.VOIP_NUMBER,
     }
 
     def __init__(self, data: PreflightRequestData):

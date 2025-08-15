@@ -1,7 +1,7 @@
 from .schemas import PreflightRequestData
 
 
-class AbuseChecks:
+class ScreeningChecks:
         
     @staticmethod
     def voip_number(data: PreflightRequestData) -> bool:

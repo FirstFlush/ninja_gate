@@ -1,7 +1,7 @@
 from django.db import DatabaseError
 import logging
-from ..dataclasses import DetectedAbuseEvent, DetectedAbuseEvents
-from ..exc import AbuseEventServiceError
+from ..preflight.dataclasses import DetectedAbuseEvent, DetectedAbuseEvents
+from ..preflight.exc import AbuseEventServiceError
 from gatekeeper.models import AbuseEvent, RiskProfile, AbuseEventType
 from gatekeeper.enums import AbuseEventSourceEnum
 

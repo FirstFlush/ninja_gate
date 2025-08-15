@@ -2,7 +2,7 @@ import logging
 from gatekeeper.enums import AbuseEventSourceEnum
 from ..schemas import PreflightRequestData
 from .screening import ScreeningService
-from .abuse_event import AbuseEventService
+from ...services.abuse_event import AbuseEventService
 from ..dataclasses import DetectedAbuseEvents
 from gatekeeper.models import AbuseEvent, RiskProfile
 

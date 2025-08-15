@@ -5,7 +5,7 @@ from typing import Any
 class StreetNinjaEnumMeta(EnumMeta):
 
     @property
-    def choices(cls) -> list[tuple[Any, str]]:
+    def choices(cls) -> list[tuple[str, str]]:
         """Returns a list of tuplesav that can be used in models.CharField's choices property.
         Example:
             [

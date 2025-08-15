@@ -54,6 +54,12 @@ class RiskProfile(models.Model):
 
     def __str__(self) -> str:
         return self.phone_number
+    
+    def change_status(self, new_status: RiskProfileStatus):
+        old_status = self.status
+        self.status = new_status.value
+        self.save()    
+        logger.debug(f"Changed RiskProfile `{self.__str__()}` status from {old_status} to {new_status.value}")
 
 
 class AbuseEventType(models.Model):
@@ -75,3 +81,23 @@ class AbuseEvent(models.Model):
 
     def __str__(self) -> str:
         return f"{self.profile.phone_number} | {self.event_type}"
+    
+    
+class RiskProfileStatusChange(models.Model):
+    
+    profile = models.ForeignKey(to=RiskProfile, on_delete=models.CASCADE, related_name='status_changes')
+    prev_status = models.CharField(max_length=24, choices=RiskProfileStatus.choices)
+    new_status = models.CharField(max_length=24, choices=RiskProfileStatus.choices)
+    effective_at = models.DateTimeField(default=timezone.now)
+    expires_at = models.DateTimeField(null=True, blank=True)
+    notes = models.TextField(null=True, blank=True)
+    trigger_event = models.ForeignKey(to=AbuseEvent, on_delete=models.SET_NULL, null=True, blank=True)
+    # created_by = models.CharField(max_length=50, default='system')  # 'system', 'admin', 'auto_expire'
+    
+    created = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=['profile', 'expires_at']),
+            models.Index(fields=['expires_at']),
+        ]
