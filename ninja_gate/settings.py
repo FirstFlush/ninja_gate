@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from dotenv import load_dotenv
 import os
 from pathlib import Path
-from .logging_config import LOGGING
+from street_ninja_common.config.logging import LOGGING
 
 load_dotenv()
 
