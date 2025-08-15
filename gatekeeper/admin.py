@@ -5,11 +5,11 @@ from .models import RiskProfile, AbuseEventType, AbuseEvent
 
 @admin.register(RiskProfile)
 class RiskProfileAdmin(BaseAdmin):
-    list_display = ('phone_number', 'risk_level', 'status', 'risk_score', 'last_seen', 'created')
-    list_filter = ('risk_level', 'status', 'created')
+    list_display = ('phone_number', 'risk_level', 'status', 'last_seen', 'created')
+    list_filter = ('risk_level', 'status')
     search_fields = ('phone_number',)
     readonly_fields = ('created',)
-    ordering = ('-risk_score', '-last_seen')
+    ordering = ('phone_number',)
     
     fieldsets = (
         (None, {
@@ -27,14 +27,14 @@ class RiskProfileAdmin(BaseAdmin):
 
 @admin.register(AbuseEventType)
 class AbuseEventTypeAdmin(BaseAdmin):
-    list_display = ('name', 'category', 'severity_weight', 'description')
+    list_display = ('name', 'category', 'description')
     list_filter = ('category',)
     search_fields = ('name', 'description')
-    ordering = ('-severity_weight', 'category', 'name')
+    ordering = ('category', 'name')
     
     fieldsets = (
         (None, {
-            'fields': ('name', 'category', 'severity_weight')
+            'fields': ('name', 'category',)
         }),
         ('Details', {
             'fields': ('description',)
