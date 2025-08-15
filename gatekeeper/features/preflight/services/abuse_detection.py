@@ -2,7 +2,7 @@ import logging
 from typing import Callable
 from gatekeeper.enums import AbuseEventTypeEnum
 from ..abuse_checks import AbuseChecks
-from ..dataclasses import DetectedAbuseEvent
+from ..dataclasses import DetectedAbuseEvent, DetectedAbuseEvents
 from ..exc import AbuseDetectionError
 from ..schemas import PreflightRequestData
 
@@ -24,7 +24,7 @@ class AbuseDetectionService:
     def __init__(self, data: PreflightRequestData):
         self.data = data
         
-    def run_checks(self) -> list[DetectedAbuseEvent]:
+    def run_checks(self) -> DetectedAbuseEvents:
         try:
             abuse_events = self._detect_abuse_events()
         except Exception as e:
@@ -33,7 +33,11 @@ class AbuseDetectionService:
             raise AbuseDetectionError(msg) from e
         else:
             logger.debug(f"{self.__class__.__name__} ran all abuse checks. Abuse events: `{abuse_events}`")
-            return abuse_events
+            return DetectedAbuseEvents(
+                events=abuse_events,
+                sms_id=self.data.sms_id,
+                msg=self.data.msg,
+            )
 
     def _detect_abuse_events(self) -> list[DetectedAbuseEvent]:
         abuse_events: list[DetectedAbuseEvent] = []

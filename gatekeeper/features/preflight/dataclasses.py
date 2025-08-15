@@ -7,3 +7,9 @@ class DetectedAbuseEvent:
     method_name: str
     abuse_event_type: AbuseEventTypeEnum
     
+
+@dataclass
+class DetectedAbuseEvents:
+    events: list[DetectedAbuseEvent]
+    sms_id: int
+    msg: str
