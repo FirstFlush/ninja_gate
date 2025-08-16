@@ -1,14 +1,20 @@
 annotated-types==0.7.0
 asgiref==3.9.1
+async-timeout==5.0.1
 colorlog==6.9.0
 Django==5.2.5
+django-extensions==4.1
 django-ninja==1.4.3
+django-redis==5.4.0
 phonenumbers==9.0.11
+psycopg==3.2.9
+psycopg-binary==3.2.9
 pydantic==2.11.7
 pydantic_core==2.33.2
 python-dotenv==1.1.1
+redis==6.4.0
 sqlparse==0.5.3
+street-ninja-common @ git+https://github.com/firstflush/street_ninja_common.git
 typed-api-response==1.0.0
 typing-inspection==0.4.1
 typing_extensions==4.14.1
-street_ninja_common @ git+https://github.com/firstflush/street_ninja_common.git
