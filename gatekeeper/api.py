@@ -10,6 +10,25 @@ logger = logging.getLogger(__name__)
 router = Router()
 
 
+# @router.get("/test-cache")
+# def test_cache(request: HttpRequest):
+#     from cache.service import GateActivityCacheService
+#     from django.utils import timezone
+    
+#     phone_number = "604-618-1414"
+#     service = GateActivityCacheService()
+    
+#     bleh = service.get_activity(phone_number)
+#     print(bleh)
+#     bleh.invalid_msgs.append(timezone.now().timestamp())
+#     service.set_activity(phone_number, data=bleh)
+#     print()
+#     bleh2 = service.get_activity(phone_number)
+#     print(bleh2)
+    
+#     return Response({"foo":"bar"})
+
+
 @router.post("/preflight")
 def predict(request: HttpRequest, data: PreflightRequestData):
 
@@ -18,9 +37,6 @@ def predict(request: HttpRequest, data: PreflightRequestData):
     print(abuse_events.__dict__)
 
     return Response({"foo":"bar"})
-
-
-
 
 
 @router.post("/unresolved")

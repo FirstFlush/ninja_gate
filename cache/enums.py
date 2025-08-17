@@ -1,10 +1,4 @@
-from street_ninja_common.cache import RedisKeyEnum
+from street_ninja_common.cache import CacheKey
 
-
-class GateCachePrefix(RedisKeyEnum):
-
-    ACTIVITY = "gate:activity:"
-    
-    @classmethod
-    def activity_key(cls, phone_number: str) -> str:
-        return f"{cls.ACTIVITY.value}{phone_number}"
+class NinjaGateCacheKey(CacheKey):
+    GATE_ACTIVITY = "gate:activity:"
