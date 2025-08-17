@@ -1,11 +1,11 @@
 from street_ninja_common.cache import CacheClient, CacheCircuitBreaker
 from .access_patterns import GateActivityAccessPattern
-from .dataclasses import GateActivityData#, UnixTimestamp
+from .dataclasses import GateActivityData
 from django.utils import timezone
 
 
 class GateActivityCacheService:
-    
+
     def __init__(self):
         self.circuit_breaker = CacheCircuitBreaker()
         self.access_pattern = GateActivityAccessPattern()
