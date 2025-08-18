@@ -22,9 +22,10 @@ class BaseEvaluationData(ABC):
     
     profile: RiskProfile
     cached_data: GateActivityData
-    
-    
+
+
 @dataclass
-class PostflightEvaluationData(BaseEvaluationData):
+class BaseEvaluationDecision(ABC):
     
-    msg: str
+    profile: RiskProfile
+    status: RiskProfileStatus

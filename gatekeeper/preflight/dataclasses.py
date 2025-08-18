@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Optional
-from ..dataclasses import BaseEvaluationData
+from .enums import RequestAction
+from ..dataclasses import BaseEvaluationData, BaseEvaluationDecision
 from ..enums import AbuseEventTypeEnum 
 from ..models import RiskProfile, AbuseEvent
 from phonenumbers import PhoneNumber
@@ -28,3 +29,9 @@ class ScreeningCheckData:
 class PreflightEvaluationData(BaseEvaluationData):
     
     abuse_events: list[AbuseEvent]
+    
+
+@dataclass
+class PreflightEvaluationDecision(BaseEvaluationDecision):
+    
+    action = RequestAction
