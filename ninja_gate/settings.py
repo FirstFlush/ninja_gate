@@ -44,6 +44,10 @@ else:
 
 # Env Vars
 API_VERSION = os.getenv("API_VERSION")
+
+ABUSE_EVENTS_MAX = int(os.getenv("ABUSE_EVENTS_MAX", 3))
+ABUSE_EVENTS_WINDOW = int(os.getenv("ABUSE_EVENTS_WINDOW", 60 * 60 * 24))
+
 SMS_MIN_LENGTH=int(os.getenv("SMS_MIN_LENGTH", 5))
 SMS_MAX_LENGTH=int(os.getenv("SMS_MAX_LENGTH", 150))
 

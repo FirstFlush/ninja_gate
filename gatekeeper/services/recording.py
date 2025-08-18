@@ -8,11 +8,12 @@ from gatekeeper.enums import AbuseEventSourceEnum
 
 logger = logging.getLogger(__name__)
 
-class AbuseEventService:
+class AbuseRecordingService:
     
     def __init__(self, risk_profile: RiskProfile, source: AbuseEventSourceEnum):
         self.risk_profile = risk_profile
         self.source = source
+
     
     def record_events(self, abuse_events: DetectedAbuseEvents) -> list[AbuseEvent]:
         try:
@@ -55,7 +56,6 @@ class AbuseEventService:
             event_type = event_type_mapping[abuse_event.abuse_event_type.value],
             source = self.source.value,
             context = abuse_event.context,
-            message_content = abuse_events.msg,
             sms_id = abuse_events.sms_id,
         ) for abuse_event in abuse_events.events]
 

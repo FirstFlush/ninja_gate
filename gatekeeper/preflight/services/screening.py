@@ -6,7 +6,7 @@ from ..screening_checks import ScreeningChecks
 from ..dataclasses import DetectedAbuseEvent, DetectedAbuseEvents, ScreeningCheckData
 from ..exc import AbuseDetectionError
 from ..schemas import PreflightRequestData
-
+from ...models import RiskProfile
 
 logger = logging.getLogger(__name__)
 
@@ -16,15 +16,16 @@ class ScreeningService:
     ABUSE_CHECK_TO_ABUSE_TYPE = {
         ScreeningChecks.country_code: AbuseEventTypeEnum.INTERNATIONAL_NUMBER,
         ScreeningChecks.area_code: AbuseEventTypeEnum.INVALID_AREA_CODE,
-        ScreeningChecks.voip_number: AbuseEventTypeEnum.VOIP_NUMBER,
+        ScreeningChecks.number_type: AbuseEventTypeEnum.INVALID_NUMBER_TYPE,
         ScreeningChecks.appropriate_length: AbuseEventTypeEnum.INVALID_MSG_LENGTH,
         # ScreeningChecks.code_injection: AbuseEventTypeEnum.MALICIOUS,
         # ScreeningChecks.commercial_spam: AbuseEventTypeEnum.COMMERCIAL_SPAM,
         # ScreeningChecks.sqli: AbuseEventTypeEnum.MALICIOUS,
     }
 
-    def __init__(self, data: PreflightRequestData):
+    def __init__(self, data: PreflightRequestData, profile: RiskProfile):
         self.data = data
+        self.profile = profile
 
     def run_checks(self) -> DetectedAbuseEvents:
         try:
@@ -47,10 +48,19 @@ class ScreeningService:
             abuse_event = self._run_check(check, abuse_event_type_enum)
             if abuse_event:
                 abuse_events.append(abuse_event)
-        return abuse_events
+        
+        return self._filter_events(abuse_events)
 
+    def _filter_events(self, events: list[DetectedAbuseEvent]) -> list[DetectedAbuseEvent]:
+        """Remove redundant violations when higher-priority issues are present."""
+        has_international = any(e.abuse_event_type == AbuseEventTypeEnum.INTERNATIONAL_NUMBER for e in events)
+        if has_international:
+            events = [e for e in events if e.abuse_event_type != AbuseEventTypeEnum.INVALID_AREA_CODE]
+        return events
+    
     def _screening_data(self) -> ScreeningCheckData:
         return ScreeningCheckData(
+            profile=self.profile,
             phone_number=self.data.phone_number,
             msg=self.data.msg,
             parsed_number=phonenumbers.parse(self.data.phone_number),

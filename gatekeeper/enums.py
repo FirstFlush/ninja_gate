@@ -47,12 +47,12 @@ class AbuseEventTypeEnum(StreetNinjaEnum):
     MALICIOUS = "malicious"
     INVALID_MSG_LENGTH = "invalid_msg_length"
     INTERNATIONAL_NUMBER = "international_number"
-    INVALID_AREA_CODE = "invalid_area_code"       # international number, but with country code 1.
-    VOIP_NUMBER = "voip_number"
-    FRUSTRATED_USER = "frustrated_user"
+    INVALID_AREA_CODE = "invalid_area_code"         # international number, but with country code 1.
+    INVALID_NUMBER_TYPE = "invalid_number_type"     # VoIP or commercial numbers
+    UNRESOLVED_MSG = "unresolved_msg"
     COMMERCIAL_SPAM = "commercial_spam"
-    
-    
+    RESTRICTED_USER_ATTEMPT = "restricted_user_attempt"
+
 class AbuseEventSourceEnum(StreetNinjaEnum):
     
     PREFLIGHT = "preflight"

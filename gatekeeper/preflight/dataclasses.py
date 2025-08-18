@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Any, Optional
-from gatekeeper.enums import AbuseEventTypeEnum 
+from ..dataclasses import BaseEvaluationData
+from ..enums import AbuseEventTypeEnum 
+from ..models import RiskProfile, AbuseEvent
 from phonenumbers import PhoneNumber
 
 @dataclass
@@ -16,6 +18,13 @@ class DetectedAbuseEvents:
 
 @dataclass
 class ScreeningCheckData:
+    profile: RiskProfile
     phone_number: str
     msg: str
     parsed_number: PhoneNumber
+    
+
+@dataclass
+class PreflightEvaluationData(BaseEvaluationData):
+    
+    abuse_events: list[AbuseEvent]

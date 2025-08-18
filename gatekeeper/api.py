@@ -12,7 +12,7 @@ router = Router()
 
 @router.get("/test-cache")
 def test_cache(request: HttpRequest):
-    from cache.service import GateActivityCacheService
+    from gatekeeper.services.cache import GateActivityCacheService
     from django.utils import timezone
     
     phone_number = "604-618-1414"
