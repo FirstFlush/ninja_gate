@@ -33,6 +33,13 @@ class AbuseEventService:
             return saved_events
 
     def _build_event_type_mapping(self, abuse_events: list[DetectedAbuseEvent]) -> dict[str, AbuseEventType]:
+        """
+        Build a mapping from event type names to AbuseEventType objects.
+        
+        Takes a list of detected abuse events, extracts the unique event type names,
+        queries the database for the corresponding AbuseEventType objects, and returns
+        a dictionary mapping each name to its database object.
+        """
         event_type_names = {event.abuse_event_type.value for event in abuse_events}
         qs = AbuseEventType.objects.filter(name__in=event_type_names)
         return {event_type.name: event_type for event_type in qs}
@@ -47,6 +54,7 @@ class AbuseEventService:
             profile = self.risk_profile,
             event_type = event_type_mapping[abuse_event.abuse_event_type.value],
             source = self.source.value,
+            context = abuse_event.context,
             message_content = abuse_events.msg,
             sms_id = abuse_events.sms_id,
         ) for abuse_event in abuse_events.events]

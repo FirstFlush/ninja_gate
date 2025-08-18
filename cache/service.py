@@ -20,7 +20,6 @@ class GateActivityCacheService:
 
     def _create_activity(self) -> GateActivityData:
         return GateActivityData(
-            valid_msgs = [],
             invalid_msgs = [],
             last_updated = timezone.now().timestamp(),
         )

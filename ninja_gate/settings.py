@@ -44,7 +44,8 @@ else:
 
 # Env Vars
 API_VERSION = os.getenv("API_VERSION")
-
+SMS_MIN_LENGTH=int(os.getenv("SMS_MIN_LENGTH", 5))
+SMS_MAX_LENGTH=int(os.getenv("SMS_MAX_LENGTH", 150))
 
 # Application definition
 

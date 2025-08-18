@@ -45,8 +45,9 @@ class AbuseCategoryEnum(StreetNinjaEnum):
 class AbuseEventTypeEnum(StreetNinjaEnum):
 
     MALICIOUS = "malicious"
+    INVALID_MSG_LENGTH = "invalid_msg_length"
     INTERNATIONAL_NUMBER = "international_number"
-    USA_NUMBER = "usa_number"       # international number, but with country code 1.
+    INVALID_AREA_CODE = "invalid_area_code"       # international number, but with country code 1.
     VOIP_NUMBER = "voip_number"
     FRUSTRATED_USER = "frustrated_user"
     COMMERCIAL_SPAM = "commercial_spam"

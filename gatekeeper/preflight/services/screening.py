@@ -1,8 +1,9 @@
 import logging
+import phonenumbers
 from typing import Callable
 from gatekeeper.enums import AbuseEventTypeEnum
 from ..screening_checks import ScreeningChecks
-from ..dataclasses import DetectedAbuseEvent, DetectedAbuseEvents
+from ..dataclasses import DetectedAbuseEvent, DetectedAbuseEvents, ScreeningCheckData
 from ..exc import AbuseDetectionError
 from ..schemas import PreflightRequestData
 
@@ -13,12 +14,13 @@ logger = logging.getLogger(__name__)
 class ScreeningService:
     
     ABUSE_CHECK_TO_ABUSE_TYPE = {
-        ScreeningChecks.code_injection: AbuseEventTypeEnum.MALICIOUS,
-        ScreeningChecks.commercial_spam: AbuseEventTypeEnum.COMMERCIAL_SPAM,
-        ScreeningChecks.international_number: AbuseEventTypeEnum.INTERNATIONAL_NUMBER,
-        ScreeningChecks.sqli: AbuseEventTypeEnum.MALICIOUS,
-        ScreeningChecks.usa_number: AbuseEventTypeEnum.USA_NUMBER,
+        ScreeningChecks.country_code: AbuseEventTypeEnum.INTERNATIONAL_NUMBER,
+        ScreeningChecks.area_code: AbuseEventTypeEnum.INVALID_AREA_CODE,
         ScreeningChecks.voip_number: AbuseEventTypeEnum.VOIP_NUMBER,
+        ScreeningChecks.appropriate_length: AbuseEventTypeEnum.INVALID_MSG_LENGTH,
+        # ScreeningChecks.code_injection: AbuseEventTypeEnum.MALICIOUS,
+        # ScreeningChecks.commercial_spam: AbuseEventTypeEnum.COMMERCIAL_SPAM,
+        # ScreeningChecks.sqli: AbuseEventTypeEnum.MALICIOUS,
     }
 
     def __init__(self, data: PreflightRequestData):
@@ -47,12 +49,21 @@ class ScreeningService:
                 abuse_events.append(abuse_event)
         return abuse_events
 
+    def _screening_data(self) -> ScreeningCheckData:
+        return ScreeningCheckData(
+            phone_number=self.data.phone_number,
+            msg=self.data.msg,
+            parsed_number=phonenumbers.parse(self.data.phone_number),
+        )
+
     def _run_check(self, check: Callable, abuse_event_type_enum: AbuseEventTypeEnum) -> DetectedAbuseEvent | None:
-        success = check(self.data)
+        screening_data = self._screening_data()
+        success: bool = check(screening_data)
         if not success:
+            logger.debug(f"Preflight check FAILED: `{check.__name__}`")
             return DetectedAbuseEvent(
-                method_name=check.__name__,
                 abuse_event_type=abuse_event_type_enum,
+                context={"Preflight check": check.__name__},
             )
         
 
