@@ -1,50 +1,24 @@
-
 from django.core.management.base import BaseCommand
-from django.conf import settings
+from django.db import transaction
 import logging
-from ...enums import AbuseEventTypeEnum, AbuseCategoryEnum
+from typing import Any
 from ...models import AbuseEventType
+from ._event_type_data import EVENT_TYPE_DATA
 
 
 logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
+    """
+    Pre-populate the AbuseEventType table with initial data.
 
+    Creates all required AbuseEventType records in a single transaction.
+    If any error occurs, all changes are rolled back.
+    """
     help = "Populate the AbuseEventType table"
-    
-    DATA = [
-        
-        {
-            "name": AbuseEventTypeEnum.INTERNATIONAL_NUMBER,
-            "category": AbuseCategoryEnum.BEHAVIORAL,
-            "description": "",
-            "severity_weight": 100,
-        },
-        
-        {
-            "name": AbuseEventTypeEnum.USA_NUMBER,
-            "category": AbuseCategoryEnum.BEHAVIORAL,
-            "description": "",
-            "severity_weight": 100,
-        },
-        
-        {
-            "name": AbuseEventTypeEnum.MALICIOUS,
-            "category": AbuseCategoryEnum.SECURITY,
-            "description": "",
-            "severity_weight": 100,
-        },
-        
-        {
-            "name": AbuseEventTypeEnum.VOIP_NUMBER,
-            "category": AbuseCategoryEnum.BEHAVIORAL,
-            "description": "",
-            "severity_weight": 100,
-        },
-        
-    ]
 
+    DATA = EVENT_TYPE_DATA
 
     def handle(self, *args, **kwargs):
         logger.info("Populating AbuseEventType table...")
@@ -56,6 +30,26 @@ class Command(BaseCommand):
             raise
         else:
             logger.info("AbuseEventType table populated")
+
+    def _handle(self):
+        with transaction.atomic():
+            for event_type in self.DATA:
+                self._save(event_type)
+
+    def _save(self, event_type: dict[str, Any]):
+        try:
+            _, created = AbuseEventType.objects.get_or_create(
+                name=event_type["name"].value,
+                category=event_type["category"].value,
+                description=event_type["description"],
+            )
+        except Exception as e:
+            msg = f"Could not populate AbuseEventType table due to an unexpected error: {e}"
+            logger.error(msg, exc_info=True)
+            raise
         
-    def _handle(self): ...
-        # AbuseEventType
+        else:
+            if created:
+                logger.info(f"AbuseEventType `{event_type['name'].value}` created")
+            else:
+                logger.info(f"AbuseEventType `{event_type['name'].value} already exists. Skipping...`")
