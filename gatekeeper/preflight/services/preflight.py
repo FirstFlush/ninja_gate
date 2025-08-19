@@ -1,4 +1,5 @@
 import logging
+from django.db.models import QuerySet
 from gatekeeper.enums import AbuseEventSourceEnum
 from ..schemas import PreflightRequestData
 from .screening import ScreeningService
@@ -34,7 +35,7 @@ class PreflightService:
 
     def _evaluation_data(
             self, 
-            abuse_events: list[AbuseEvent], 
+            abuse_events: QuerySet[AbuseEvent], 
             cached_data: GateActivityData
     ) -> PreflightEvaluationData:
         return PreflightEvaluationData(
@@ -46,11 +47,10 @@ class PreflightService:
     def _evaluate(self, data: PreflightEvaluationData): 
         PreflightEvaluationService(data)
 
-    def _update_cache(self, events: list[AbuseEvent]) -> GateActivityData:
-        timestamps = [event.created.timestamp() for event in events]
+    def _update_cache(self, events: QuerySet[AbuseEvent]) -> GateActivityData:
         return self.cache_service.update_cache(
             phone_number=self.data.phone_number,
-            timestamps=timestamps,
+            abuse_events=events,
         )
 
     def _screen_for_abuse(self) -> DetectedAbuseEvents | None:
@@ -59,7 +59,7 @@ class PreflightService:
             return abuse_events
         return None
     
-    def _record_abuse_events(self, abuse_events: DetectedAbuseEvents) -> list[AbuseEvent]:
+    def _record_abuse_events(self, abuse_events: DetectedAbuseEvents) -> QuerySet[AbuseEvent]:
         return self.recording_service.record_events(abuse_events)
            
     def _get_or_create_profile(self) -> RiskProfile:

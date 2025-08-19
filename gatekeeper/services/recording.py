@@ -1,4 +1,5 @@
 from django.db import DatabaseError
+from django.db.models import QuerySet
 import logging
 from ..preflight.dataclasses import DetectedAbuseEvent, DetectedAbuseEvents
 from ..preflight.exc import AbuseEventServiceError
@@ -15,7 +16,7 @@ class AbuseRecordingService:
         self.source = source
 
     
-    def record_events(self, abuse_events: DetectedAbuseEvents) -> list[AbuseEvent]:
+    def record_events(self, abuse_events: DetectedAbuseEvents) -> QuerySet[AbuseEvent]:
         try:
             event_type_mapping = self._build_event_type_mapping(abuse_events.events)
         except Exception as e:
@@ -33,7 +34,8 @@ class AbuseRecordingService:
             logger.debug(f"Saved `{len(saved_events)}` AbuseEvent records for phone# `{self.risk_profile.phone_number}`")
             return saved_events
 
-    def _build_event_type_mapping(self, abuse_events: list[DetectedAbuseEvent]) -> dict[str, AbuseEventType]:
+    @staticmethod
+    def _build_event_type_mapping(abuse_events: list[DetectedAbuseEvent]) -> dict[str, AbuseEventType]:
         """
         Build a mapping from event type names to AbuseEventType objects.
         
@@ -49,7 +51,7 @@ class AbuseRecordingService:
             self, 
             abuse_events: DetectedAbuseEvents,
             event_type_mapping: dict[str, AbuseEventType],
-    ) -> list[AbuseEvent]:
+    ) -> QuerySet[AbuseEvent]:
         
         to_save = [AbuseEvent(
             profile = self.risk_profile,
@@ -58,6 +60,9 @@ class AbuseRecordingService:
             context = abuse_event.context,
             sms_id = abuse_events.sms_id,
         ) for abuse_event in abuse_events.events]
-
-        return AbuseEvent.objects.bulk_create(to_save)
+        
+        instances = AbuseEvent.objects.bulk_create(to_save)
+        ids = [instance.pk for instance in instances]
+        
+        return AbuseEvent.objects.filter(id__in=ids).select_related("event_type")
         

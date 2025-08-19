@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.db import models, IntegrityError, DatabaseError
 from django.utils import timezone
 import logging
@@ -7,6 +8,7 @@ from .enums import (
     AbuseEventSourceEnum,
     RiskProfileStatus,
 )
+from cache.dataclasses import AbuseEventCache
 
 
 logger = logging.getLogger(__name__)
@@ -81,8 +83,15 @@ class AbuseEvent(models.Model):
 
     def __str__(self) -> str:
         return f"{self.profile.phone_number} | {self.event_type}"
-    
-    
+
+    def to_cache(self, dt: datetime | None = None) -> AbuseEventCache:
+        timestamp = timezone.now().timestamp() if dt is None else dt.timestamp()
+        return AbuseEventCache(
+            abuse_type=self.event_type.name,
+            timestamp=timestamp,
+        )
+
+
 class RiskProfileStatusChange(models.Model):
     
     profile = models.ForeignKey(to=RiskProfile, on_delete=models.CASCADE, related_name='status_changes')

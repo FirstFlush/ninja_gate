@@ -1,9 +1,10 @@
 from abc import ABC
 from cache.dataclasses import GateActivityData
 from django.conf import settings
-from gatekeeper.dataclasses import BaseEvaluationData, PostflightEvaluationData
+from gatekeeper.dataclasses import BaseEvaluationData
 from gatekeeper.models import AbuseEvent, RiskProfile
 from gatekeeper.preflight.dataclasses import PreflightEvaluationData
+from gatekeeper.postflight.dataclasses import PostflightEvaluationData
 
 
 class BaseRiskEvaluationService(ABC):
@@ -17,6 +18,8 @@ class PreflightEvaluationService(BaseRiskEvaluationService):
     
     def __init__(self, data: PreflightEvaluationData):
         super().__init__(data)
+
+
 
 class PostflightEvaluationService(BaseRiskEvaluationService):
     

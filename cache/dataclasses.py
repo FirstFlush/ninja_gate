@@ -1,8 +1,22 @@
 from dataclasses import dataclass
+from typing import Any
+
+@dataclass
+class AbuseEventCache:
+
+    timestamp: float
+    abuse_type: str
 
 
 @dataclass
 class GateActivityData:
     
-    invalid_msgs: list[float]
+    abuse_events: list[AbuseEventCache]
+    last_updated: float
+    
+
+@dataclass
+class GateActivityDataRough:
+    
+    abuse_events: list[dict[str, Any]]
     last_updated: float

@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from django.db.models import QuerySet
 from typing import Any, Optional
 from .enums import RequestAction
 from ..dataclasses import BaseEvaluationData, BaseEvaluationDecision
@@ -28,7 +29,7 @@ class ScreeningCheckData:
 @dataclass
 class PreflightEvaluationData(BaseEvaluationData):
     
-    abuse_events: list[AbuseEvent]
+    abuse_events: QuerySet[AbuseEvent]
     
 
 @dataclass
