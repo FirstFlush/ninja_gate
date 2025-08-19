@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from django.db.models import QuerySet
 from typing import Any, Optional
 from .enums import RequestAction
-from ..dataclasses import BaseEvaluationData, BaseEvaluationDecision
+from ..dataclasses import BaseEvaluationData, BaseDecision
 from ..enums import AbuseEventTypeEnum 
 from ..models import RiskProfile, AbuseEvent
 from phonenumbers import PhoneNumber
@@ -33,6 +33,6 @@ class PreflightEvaluationData(BaseEvaluationData):
     
 
 @dataclass
-class PreflightEvaluationDecision(BaseEvaluationDecision):
-    
+class PreflightDecision(BaseDecision):
+
     action = RequestAction

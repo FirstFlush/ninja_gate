@@ -13,10 +13,3 @@ class GateActivityData:
     
     abuse_events: list[AbuseEventCache]
     last_updated: float
-    
-
-@dataclass
-class GateActivityDataRough:
-    
-    abuse_events: list[dict[str, Any]]
-    last_updated: float

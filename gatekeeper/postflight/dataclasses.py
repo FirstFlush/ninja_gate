@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from gatekeeper.dataclasses import BaseEvaluationData, BaseEvaluationDecision
+from gatekeeper.dataclasses import BaseEvaluationData, BaseDecision
 
 
 @dataclass
@@ -9,5 +9,5 @@ class PostflightEvaluationData(BaseEvaluationData):
     
     
 @dataclass
-class PostflightEvaluationDecision(BaseEvaluationDecision):
+class PostflightDecision(BaseDecision):
     pass

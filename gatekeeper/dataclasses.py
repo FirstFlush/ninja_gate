@@ -3,7 +3,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 from cache.dataclasses import GateActivityData
-from .enums import RiskProfileStatus
+from street_ninja_common.cache import Seconds
+from .enums import RiskProfileStatus, RiskProfileActionSource
 from .models import RiskProfile, AbuseEvent
 
 
@@ -13,6 +14,7 @@ class StatusChangeData:
     profile: RiskProfile
     new_status: RiskProfileStatus
     effective_at: datetime
+    source: RiskProfileActionSource
     trigger_event: Optional[AbuseEvent] = None
     expires_at: Optional[datetime] = None
     notes: Optional[str] = None
@@ -25,7 +27,8 @@ class BaseEvaluationData(ABC):
 
 
 @dataclass
-class BaseEvaluationDecision(ABC):
+class BaseDecision(ABC):
     
     profile: RiskProfile
     status: RiskProfileStatus
+    duration: Optional[Seconds] = None

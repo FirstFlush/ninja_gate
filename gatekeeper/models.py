@@ -7,6 +7,7 @@ from .enums import (
     AbuseCategoryEnum, 
     AbuseEventSourceEnum,
     RiskProfileStatus,
+    RiskProfileActionSource
 )
 from cache.dataclasses import AbuseEventCache
 
@@ -50,6 +51,7 @@ class RiskProfile(models.Model):
     phone_number = models.CharField(max_length=20, unique=True)
     status = models.CharField(max_length=24, choices=RiskProfileStatus.choices, default=RiskProfileStatus.ACTIVE.value)
     last_seen = models.DateTimeField()
+    status_expires_at = models.DateTimeField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
 
     objects: RiskProfileManager = RiskProfileManager()
@@ -57,11 +59,12 @@ class RiskProfile(models.Model):
     def __str__(self) -> str:
         return self.phone_number
     
-    def change_status(self, new_status: RiskProfileStatus):
+    def change_status(self, new_status: RiskProfileStatus, expires_at: datetime | None = None):
         old_status = self.status
         self.status = new_status.value
+        self.status_expires_at = None if new_status == RiskProfileStatus.ACTIVE else expires_at
         self.save()    
-        logger.debug(f"Changed RiskProfile `{self.__str__()}` status from {old_status} to {new_status.value}")
+        logger.debug(f"Changed RiskProfile `{self.__str__()}` status from {old_status} to {new_status.value}. Expiry: {expires_at.strftime('%Y-%m-%d %H:%M:%S') if isinstance(expires_at, datetime) else None}")
 
 
 class AbuseEventType(models.Model):
@@ -92,21 +95,22 @@ class AbuseEvent(models.Model):
         )
 
 
-class RiskProfileStatusChange(models.Model):
+class RiskProfileAction(models.Model):
     
     profile = models.ForeignKey(to=RiskProfile, on_delete=models.CASCADE, related_name='status_changes')
     prev_status = models.CharField(max_length=24, choices=RiskProfileStatus.choices)
     new_status = models.CharField(max_length=24, choices=RiskProfileStatus.choices)
     effective_at = models.DateTimeField(default=timezone.now)
-    expires_at = models.DateTimeField(null=True, blank=True)
+    source = models.CharField(max_length=50, choices=RiskProfileActionSource.choices)
     notes = models.TextField(null=True, blank=True)
     trigger_event = models.ForeignKey(to=AbuseEvent, on_delete=models.SET_NULL, null=True, blank=True)
-    # created_by = models.CharField(max_length=50, default='system')  # 'system', 'admin', 'auto_expire'
     
     created = models.DateTimeField(auto_now_add=True)
     
     class Meta:
+        ordering = ['-effective_at']
         indexes = [
-            models.Index(fields=['profile', 'expires_at']),
-            models.Index(fields=['expires_at']),
+            models.Index(fields=['profile', '-effective_at']),  # Get user's recent actions
+            models.Index(fields=['new_status', 'effective_at']),  # Find all suspensions/bans by date
+            models.Index(fields=['trigger_event']),  # If you query by abuse event
         ]

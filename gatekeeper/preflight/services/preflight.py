@@ -9,7 +9,7 @@ from gatekeeper.models import AbuseEvent, RiskProfile
 from gatekeeper.services.cache import GateActivityCacheService
 from gatekeeper.services.evaluation import PreflightEvaluationService
 from gatekeeper.services.recording import AbuseRecordingService
-from gatekeeper.services.risk_status import RiskStatusService
+from gatekeeper.services.risk_profile_action import RiskProfileActionService
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ class PreflightService:
         self.recording_service = AbuseRecordingService(self.risk_profile, AbuseEventSourceEnum.PREFLIGHT)
         self.cache_service = GateActivityCacheService()
         self._evaluation_cls = PreflightEvaluationService
-        self._risk_status_cls = RiskStatusService
+        self._profile_action_cls = RiskProfileActionService
 
     def main(self):
         abuse_events = self._screen_for_abuse()
@@ -45,7 +45,7 @@ class PreflightService:
         )
 
     def _evaluate(self, data: PreflightEvaluationData): 
-        PreflightEvaluationService(data)
+        self._evaluation_cls(data)
 
     def _update_cache(self, events: QuerySet[AbuseEvent]) -> GateActivityData:
         return self.cache_service.update_cache(
