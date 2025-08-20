@@ -51,6 +51,9 @@ ABUSE_EVENTS_WINDOW = int(os.getenv("ABUSE_EVENTS_WINDOW", 60 * 60 * 24))
 SMS_MIN_LENGTH=int(os.getenv("SMS_MIN_LENGTH", 5))
 SMS_MAX_LENGTH=int(os.getenv("SMS_MAX_LENGTH", 150))
 
+FLAGGED_HOURS_DEFAULT = int(os.getenv("FLAGGED_HOURS_DEFAULT", 6))
+SUSPENDED_DAYS_DEFAULT = int(os.getenv("SUSPENDED_DAYS_DEFAULT", 30))
+
 # Application definition
 
 INSTALLED_APPS = [

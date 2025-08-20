@@ -1,6 +1,7 @@
 from abc import ABC
 from dataclasses import dataclass
 from datetime import datetime
+from django.db.models import QuerySet
 from typing import Optional
 from cache.dataclasses import GateActivityData
 from street_ninja_common.cache import Seconds
@@ -9,26 +10,23 @@ from .models import RiskProfile, AbuseEvent
 
 
 @dataclass
-class StatusChangeData:
+class RiskProfileActionData:
 
     profile: RiskProfile
-    new_status: RiskProfileStatus
-    effective_at: datetime
+    status: RiskProfileStatus
     source: RiskProfileActionSource
     trigger_event: Optional[AbuseEvent] = None
-    expires_at: Optional[datetime] = None
+    expiry: Optional[datetime] = None
     notes: Optional[str] = None
-    
+
 @dataclass
-class BaseEvaluationData(ABC):
+class EvaluationData(ABC):
     
     profile: RiskProfile
     cached_data: GateActivityData
-
-
-@dataclass
-class BaseDecision(ABC):
+    msg: str
     
-    profile: RiskProfile
-    status: RiskProfileStatus
-    duration: Optional[Seconds] = None
+@dataclass
+class PreflightEvaluationData(EvaluationData):
+
+    current_events: QuerySet[AbuseEvent]

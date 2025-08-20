@@ -3,8 +3,9 @@ from django.db.models import QuerySet
 from gatekeeper.enums import AbuseEventSourceEnum
 from ..schemas import PreflightRequestData
 from .screening import ScreeningService
-from ..dataclasses import DetectedAbuseEvents, PreflightEvaluationData
+from ..dataclasses import DetectedAbuseEvents
 from cache.dataclasses import GateActivityData
+from gatekeeper.dataclasses import PreflightEvaluationData
 from gatekeeper.models import AbuseEvent, RiskProfile
 from gatekeeper.services.cache import GateActivityCacheService
 from gatekeeper.services.evaluation import PreflightEvaluationService
@@ -30,18 +31,20 @@ class PreflightService:
         if abuse_events:
             abuse_event_records = self._record_abuse_events(abuse_events)
             cached_data = self._update_cache(abuse_event_records)
-            evaluation_data = self._evaluation_data(abuse_event_records, cached_data)
+            evaluation_data = self._evaluation_data(cached_data, abuse_event_records)
+                        
             self._evaluate(evaluation_data)
 
     def _evaluation_data(
             self, 
-            abuse_events: QuerySet[AbuseEvent], 
-            cached_data: GateActivityData
+            cached_data: GateActivityData,
+            abuse_events: QuerySet[AbuseEvent],
     ) -> PreflightEvaluationData:
         return PreflightEvaluationData(
             profile=self.risk_profile,
             cached_data=cached_data,
-            abuse_events=abuse_events,
+            current_events=abuse_events,
+            msg=self.data.msg,
         )
 
     def _evaluate(self, data: PreflightEvaluationData): 

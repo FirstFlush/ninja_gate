@@ -70,10 +70,14 @@ class RiskProfile(models.Model):
 class AbuseEventType(models.Model):
     name = models.CharField(max_length=24, choices=AbuseEventTypeEnum.choices, unique=True)
     category = models.CharField(max_length=24, choices=AbuseCategoryEnum.choices)
-    description = models.TextField(null=True, blank=True)   # Optional: human-readable description
+    description = models.TextField(null=True, blank=True)                   # Optional: human-readable description
 
     def __str__(self) -> str:
         return self.name
+
+    @property
+    def enum(self) -> AbuseEventTypeEnum:
+        return AbuseEventTypeEnum(self.name)
 
 
 class AbuseEvent(models.Model):
@@ -90,6 +94,7 @@ class AbuseEvent(models.Model):
     def to_cache(self, dt: datetime | None = None) -> AbuseEventCache:
         timestamp = timezone.now().timestamp() if dt is None else dt.timestamp()
         return AbuseEventCache(
+            sms_id=self.sms_id,
             abuse_type=self.event_type.name,
             timestamp=timestamp,
         )
@@ -100,17 +105,16 @@ class RiskProfileAction(models.Model):
     profile = models.ForeignKey(to=RiskProfile, on_delete=models.CASCADE, related_name='status_changes')
     prev_status = models.CharField(max_length=24, choices=RiskProfileStatus.choices)
     new_status = models.CharField(max_length=24, choices=RiskProfileStatus.choices)
-    effective_at = models.DateTimeField(default=timezone.now)
     source = models.CharField(max_length=50, choices=RiskProfileActionSource.choices)
     notes = models.TextField(null=True, blank=True)
     trigger_event = models.ForeignKey(to=AbuseEvent, on_delete=models.SET_NULL, null=True, blank=True)
-    
+
     created = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        ordering = ['-effective_at']
+        ordering = ['-created']
         indexes = [
-            models.Index(fields=['profile', '-effective_at']),  # Get user's recent actions
-            models.Index(fields=['new_status', 'effective_at']),  # Find all suspensions/bans by date
+            models.Index(fields=['profile', '-created']),  # Get user's recent actions
+            models.Index(fields=['new_status', 'created']),  # Find all suspensions/bans by date
             models.Index(fields=['trigger_event']),  # If you query by abuse event
         ]

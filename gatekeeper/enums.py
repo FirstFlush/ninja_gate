@@ -53,6 +53,7 @@ class AbuseEventTypeEnum(StreetNinjaEnum):
     COMMERCIAL_SPAM = "commercial_spam"
     RESTRICTED_USER_ATTEMPT = "restricted_user_attempt"
 
+
 class AbuseEventSourceEnum(StreetNinjaEnum):
     
     PREFLIGHT = "preflight"

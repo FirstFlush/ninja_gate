@@ -1,10 +1,9 @@
 from dataclasses import dataclass
-from django.db.models import QuerySet
 from typing import Any, Optional
 from .enums import RequestAction
-from ..dataclasses import BaseEvaluationData, BaseDecision
-from ..enums import AbuseEventTypeEnum 
-from ..models import RiskProfile, AbuseEvent
+from ..dataclasses import RiskProfileActionData
+from ..enums import AbuseEventTypeEnum
+from ..models import RiskProfile
 from phonenumbers import PhoneNumber
 
 @dataclass
@@ -27,12 +26,6 @@ class ScreeningCheckData:
     
 
 @dataclass
-class PreflightEvaluationData(BaseEvaluationData):
-    
-    abuse_events: QuerySet[AbuseEvent]
-    
-
-@dataclass
-class PreflightDecision(BaseDecision):
-
-    action = RequestAction
+class PreflightEvaluation:
+    db_action: RiskProfileActionData
+    request_action: RequestAction
