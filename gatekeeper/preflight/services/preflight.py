@@ -3,12 +3,12 @@ from django.db.models import QuerySet
 from gatekeeper.enums import AbuseEventSourceEnum
 from ..schemas import PreflightRequestData
 from .screening import ScreeningService
-from ..dataclasses import DetectedAbuseEvents
+from ..dataclasses import DetectedAbuseEvents, PreflightEvaluation
 from cache.dataclasses import GateActivityData
 from gatekeeper.dataclasses import PreflightEvaluationData
 from gatekeeper.models import AbuseEvent, RiskProfile
 from gatekeeper.services.cache import GateActivityCacheService
-from gatekeeper.services.evaluation import PreflightEvaluationService
+from gatekeeper.services.evaluation import PreflightEvaluationService, EvaluationServiceError
 from gatekeeper.services.recording import AbuseRecordingService
 from gatekeeper.services.risk_profile_action import RiskProfileActionService
 
@@ -32,8 +32,10 @@ class PreflightService:
             abuse_event_records = self._record_abuse_events(abuse_events)
             cached_data = self._update_cache(abuse_event_records)
             evaluation_data = self._evaluation_data(cached_data, abuse_event_records)
-                        
             self._evaluate(evaluation_data)
+            # risk profile action service
+            # build response
+
 
     def _evaluation_data(
             self, 
@@ -47,8 +49,23 @@ class PreflightService:
             msg=self.data.msg,
         )
 
-    def _evaluate(self, data: PreflightEvaluationData): 
-        self._evaluation_cls(data)
+    def _evaluate(self, data: PreflightEvaluationData) -> PreflightEvaluation:
+        try:
+            service = self._evaluation_cls(data)
+        except Exception as e:
+            msg = f"Failed to instantiate PreflightEvaluationService due to an unknown error: {e}"
+            logger.error(msg, exc_info=True)
+            raise EvaluationServiceError from e
+        else:
+            try:
+                evaluation_data = service.evaluate()
+            except Exception as e:
+                msg = f"Failed to build PreflightEvaluation due to an unknown error: {e}"
+                logger.error(msg, exc_info=True)
+                raise EvaluationServiceError from e
+            else:
+                logger.debug(f"Successfull created {evaluation_data.__class__.__name__}")
+                return evaluation_data
 
     def _update_cache(self, events: QuerySet[AbuseEvent]) -> GateActivityData:
         return self.cache_service.update_cache(

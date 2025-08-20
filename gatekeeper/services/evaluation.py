@@ -11,6 +11,10 @@ from gatekeeper.preflight.enums import RequestAction
 logger = logging.getLogger(__name__)
 
 
+class EvaluationServiceError(Exception):
+    """Raised when the EvaluationService fails for unknown reasons"""
+    pass
+
 class BaseRiskEvaluationService(ABC):
 
     FLAGGED_HOURS_DEFAULT = settings.FLAGGED_HOURS_DEFAULT
