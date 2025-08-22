@@ -11,15 +11,15 @@ router = Router()
 
 
 @router.post("/preflight")
-def predict(request: HttpRequest, data: PreflightRequestData):
+def preflight(request: HttpRequest, data: PreflightRequestData):
 
-    service = PreflightService(data)    
-    service.main()
+    service = PreflightService(data)
+    response = service.main()
 
-    return Response({"foo":"bar"})
+    return Response(response)
 
 
-@router.post("/unresolved")
-def unresolved(request: HttpRequest):
+@router.post("/postflight")
+def postflight(request: HttpRequest):
     
     return Response({"foo":"bar"})

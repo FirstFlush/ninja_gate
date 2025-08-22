@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Optional
-from .enums import RequestAction
 from ..dataclasses import RiskProfileActionData
-from ..enums import AbuseEventTypeEnum
+from ..enums import AbuseEventTypeEnum, ResponseAction
 from ..models import RiskProfile
 from phonenumbers import PhoneNumber
 
@@ -23,9 +22,9 @@ class ScreeningCheckData:
     phone_number: str
     msg: str
     parsed_number: PhoneNumber
-    
 
 @dataclass
 class PreflightEvaluation:
     db_action: RiskProfileActionData
-    request_action: RequestAction
+    response_action: ResponseAction
+

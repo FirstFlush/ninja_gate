@@ -51,7 +51,7 @@ class RiskProfile(models.Model):
     phone_number = models.CharField(max_length=20, unique=True)
     status = models.CharField(max_length=24, choices=RiskProfileStatus.choices, default=RiskProfileStatus.ACTIVE.value)
     last_seen = models.DateTimeField()
-    status_expires_at = models.DateTimeField(null=True, blank=True)
+    expiry = models.DateTimeField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
 
     objects: RiskProfileManager = RiskProfileManager()
@@ -59,12 +59,12 @@ class RiskProfile(models.Model):
     def __str__(self) -> str:
         return self.phone_number
     
-    def change_status(self, new_status: RiskProfileStatus, expires_at: datetime | None = None):
+    def change_status(self, new_status: RiskProfileStatus, expiry: datetime | None = None):
         old_status = self.status
         self.status = new_status.value
-        self.status_expires_at = None if new_status == RiskProfileStatus.ACTIVE else expires_at
+        self.expiry = None if new_status == RiskProfileStatus.ACTIVE else expiry
         self.save()    
-        logger.debug(f"Changed RiskProfile `{self.__str__()}` status from {old_status} to {new_status.value}. Expiry: {expires_at.strftime('%Y-%m-%d %H:%M:%S') if isinstance(expires_at, datetime) else None}")
+        logger.debug(f"Changed RiskProfile `{self.__str__()}` status from {old_status} to {new_status.value}. Expiry: {expiry.strftime('%Y-%m-%d %H:%M:%S') if isinstance(expiry, datetime) else None}")
 
 
 class AbuseEventType(models.Model):

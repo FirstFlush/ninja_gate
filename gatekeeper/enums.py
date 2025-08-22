@@ -57,11 +57,18 @@ class AbuseEventTypeEnum(StreetNinjaEnum):
 class AbuseEventSourceEnum(StreetNinjaEnum):
     
     PREFLIGHT = "preflight"
-    POST_ANALYSIS = "postflight"
-    
+    POSTFLIGHT = "postflight"
+
+
 class RiskProfileActionSource(StreetNinjaEnum):
     
     PREFLIGHT = "preflight"
     POST_ANALYSIS = "postflight"
     MANUAL = "manual"
     AUTO_EXPIRE = "auto_expire"
+
+
+class ResponseAction(StreetNinjaEnum):
+    PROCEED = "proceed"
+    DROP = "drop"
+    PROCEED_DROP_JUNK = "proceed_drop_junk"

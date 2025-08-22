@@ -17,9 +17,12 @@ class RiskProfileActionService:
         self.prev_status = self.data.profile.status
 
     @classmethod
-    def change_status(cls, status_change: RiskProfileActionData) -> RiskProfileAction:
-        service = cls(status_change)
-        return service._change_status()
+    def change_status(cls, action_data: RiskProfileActionData) -> RiskProfileAction | None:
+        service = cls(action_data)
+        if service.data.expiry != service.data.profile.expiry \
+        or service.data.status.value != service.data.profile.status:
+            return service._change_status()
+        return None
 
     @classmethod
     def expire_status(

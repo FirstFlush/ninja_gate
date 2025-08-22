@@ -1,16 +1,20 @@
 import logging
 from django.db.models import QuerySet
+from typed_api_response.builders import ApiResponse
 from gatekeeper.enums import AbuseEventSourceEnum
+from ...enums import ResponseAction
 from ..schemas import PreflightRequestData
 from .screening import ScreeningService
+from .response import PreflightResponseService
 from ..dataclasses import DetectedAbuseEvents, PreflightEvaluation
 from cache.dataclasses import GateActivityData
-from gatekeeper.dataclasses import PreflightEvaluationData
+from gatekeeper.dataclasses import PreflightEvaluationData, RiskProfileActionData
 from gatekeeper.models import AbuseEvent, RiskProfile
 from gatekeeper.services.cache import GateActivityCacheService
 from gatekeeper.services.evaluation import PreflightEvaluationService, EvaluationServiceError
 from gatekeeper.services.recording import AbuseRecordingService
 from gatekeeper.services.risk_profile_action import RiskProfileActionService
+
 
 logger = logging.getLogger(__name__)
 
@@ -25,17 +29,31 @@ class PreflightService:
         self.cache_service = GateActivityCacheService()
         self._evaluation_cls = PreflightEvaluationService
         self._profile_action_cls = RiskProfileActionService
+        self._response_cls = PreflightResponseService
 
-    def main(self):
+    def main(self) -> ApiResponse:
         abuse_events = self._screen_for_abuse()
         if abuse_events:
             abuse_event_records = self._record_abuse_events(abuse_events)
             cached_data = self._update_cache(abuse_event_records)
             evaluation_data = self._evaluation_data(cached_data, abuse_event_records)
-            self._evaluate(evaluation_data)
-            # risk profile action service
-            # build response
+            evaluation = self._evaluate(evaluation_data)
+            self._take_action(evaluation.db_action)
+            response = self._response(evaluation.response_action)
+        else:
+            response_action = ResponseAction.PROCEED
+            response = self._response(response_action)
+        return response
 
+    def _response(self, action: ResponseAction) -> ApiResponse:
+        service = self._response_cls(
+            action=action,
+            sms_id=self.data.sms_id,
+        )
+        return service.response(status=200)
+
+    def _take_action(self, data: RiskProfileActionData):
+        self._profile_action_cls.change_status(data)
 
     def _evaluation_data(
             self, 

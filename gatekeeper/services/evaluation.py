@@ -3,10 +3,10 @@ from datetime import datetime, timedelta
 import logging
 from django.conf import settings
 from gatekeeper.dataclasses import EvaluationData, PreflightEvaluationData, RiskProfileActionData
-from gatekeeper.enums import RiskProfileStatus
+from gatekeeper.enums import RiskProfileStatus, ResponseAction
 from gatekeeper.models import AbuseEvent, AbuseEventTypeEnum, RiskProfileActionSource
 from gatekeeper.preflight.dataclasses import PreflightEvaluation
-from gatekeeper.preflight.enums import RequestAction
+
 
 logger = logging.getLogger(__name__)
 
@@ -39,10 +39,6 @@ class BaseRiskEvaluationService(ABC):
 
     def __init__(self, data: EvaluationData):
         self.data = data
-
-    # @abstractmethod
-    # def evaluate(self, **kwargs):
-    #     pass
 
     def _is_within_threshold(self, threshold: int | None = None) -> bool:
         if threshold is None:
@@ -83,6 +79,7 @@ class BaseRiskEvaluationService(ABC):
         return self._create_action_data(
             status=RiskProfileStatus.ACTIVE,
             event=event,
+            expiry=None,
         )
 
     def _flagged(self, event: AbuseEvent) -> RiskProfileActionData:
@@ -105,16 +102,20 @@ class BaseRiskEvaluationService(ABC):
         )
     
     def _banned(self, event: AbuseEvent) -> RiskProfileActionData:
-        return self._create_action_data(status=RiskProfileStatus.BANNED, event=event,)
+        return self._create_action_data(
+            status=RiskProfileStatus.BANNED, 
+            event=event, 
+            expiry=None
+        )
 
 
 class PreflightEvaluationService(BaseRiskEvaluationService):
 
     REQUEST_ACTIONS = {
-        RiskProfileStatus.ACTIVE: RequestAction.PROCEED,
-        RiskProfileStatus.FLAGGED: RequestAction.PROCEED_DROP_JUNK,
-        RiskProfileStatus.SUSPENDED: RequestAction.DROP,
-        RiskProfileStatus.BANNED: RequestAction.DROP,
+        RiskProfileStatus.ACTIVE: ResponseAction.PROCEED,
+        RiskProfileStatus.FLAGGED: ResponseAction.PROCEED_DROP_JUNK,
+        RiskProfileStatus.SUSPENDED: ResponseAction.DROP,
+        RiskProfileStatus.BANNED: ResponseAction.DROP,
     }
 
     def __init__(self, data: PreflightEvaluationData):
@@ -132,7 +133,7 @@ class PreflightEvaluationService(BaseRiskEvaluationService):
             key=lambda event: self.SEVERITY_RANK[self.ABUSE_TYPE_ACTIONS[event.event_type.enum]]
         )
     
-    def _request_action(self, status: RiskProfileStatus) -> RequestAction:
+    def _request_action(self, status: RiskProfileStatus) -> ResponseAction:
         return self.REQUEST_ACTIONS[status]
     
     def evaluate(self) -> PreflightEvaluation:
@@ -140,7 +141,7 @@ class PreflightEvaluationService(BaseRiskEvaluationService):
         db_action = self._db_action(event)
         return PreflightEvaluation(
             db_action = db_action,
-            request_action = self._request_action(db_action.status)
+            response_action = self._request_action(db_action.status)
         )
 
 class PostflightEvaluationService(BaseRiskEvaluationService):
